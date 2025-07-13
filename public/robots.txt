@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Security
+Disallow: /admin/
+Disallow: /config/
+Disallow: /.env
+Disallow: /api/
+
+Sitemap: https://flipme.instaguru.shop/sitemap.xml
