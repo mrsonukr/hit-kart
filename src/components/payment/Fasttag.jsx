@@ -2,24 +2,16 @@
 import React, { useState, useEffect } from "react";
 import { calculateCartTotals } from "../../utils/cartUtils";
 
-// Your custom payment URL format
-const customPaymentUrl =
-  "//pay?ver=01&mode=19&pa=gurustore741261.rzp@icici&pn=GuruStore&tr=RZPQrK9DBYOlGyBxMqrv2&cu=INR&mc=5732&qrMedium=04&tn=PaymenttoGuruStore";
-
 const formatNumberWithCommas = (num) =>
   num.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
+const upiId = "netc.RJ10CA3367@mairtel";
+const payeeName = "NETC FASTag";
 
 const UPIPaymentOptions = () => {
   const [selected, setSelected] = useState("upi");
   const [cartTotals, setCartTotals] = useState({
-    totalMRP: 0,
-    totalDiscount: 0,
-    totalAmount: 0,
-    deliveryCharges: 0,
-    packagingFee: 0,
     finalAmount: 0,
-    totalItems: 0,
-    savings: 0,
   });
 
   useEffect(() => {
@@ -35,66 +27,45 @@ const UPIPaymentOptions = () => {
 
   const updateCartTotals = () => {
     const totals = calculateCartTotals();
-    setCartTotals(totals);
+    setCartTotals({ finalAmount: totals.finalAmount || 0 });
   };
 
   const generateLink = (scheme) => {
-    return `${scheme}:${customPaymentUrl}&am=${cartTotals.finalAmount}`;
+    const base = `${scheme}://pay?pa=${upiId}&pn=${encodeURIComponent(
+      payeeName
+    )}&cu=INR&am=${cartTotals.finalAmount}`;
+    return base;
   };
 
   const paymentOptions = [
     {
       id: "phonePe",
       label: "PhonePe",
-      img: "assets/images/svg/phonepe.svg",
+      img: "/assets/images/svg/phonepe.svg",
       scheme: "phonepe",
     },
     {
       id: "paytm",
       label: "Paytm",
-      img: "assets/images/svg/paytm-icon.svg",
+      img: "/assets/images/svg/paytm-icon.svg",
       scheme: "paytmmp",
     },
     {
       id: "g-pay",
       label: "Google Pay",
-      img: "assets/images/svg/gpay.svg",
+      img: "/assets/images/svg/gpay.svg",
       scheme: "upi",
     },
     {
       id: "upi",
-      label: "Others UPI",
-      img: "assets/images/svg/upi-app.svg",
+      label: "Other UPI Apps",
+      img: "/assets/images/svg/upi-app.svg",
       scheme: "upi",
     },
   ];
 
   return (
     <div className="bg-gray-100 p-4 pb-0 border-y border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <img src="/assets/images/svg/upi.svg" alt="" />
-        <svg
-          className="rotate-180"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <path
-            d="M7 10L12 15"
-            stroke="#202224"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-          />
-          <path
-            d="M17 10L12 15"
-            stroke="#202224"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
       <div className="z-10 bg-white rounded-lg mb-5 mx-auto">
         {paymentOptions.map(({ id, label, img, scheme }) => (
           <div key={id} className="border-b border-gray-200 last:border-b-0 py-2">
